@@ -1,0 +1,37 @@
+```cpp
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+class Tollway {
+private:
+    double distance;
+    double toll;
+public:
+    Tollway(double distance) {
+        this->distance = distance;
+        this->toll = 0;
+    }
+
+    void calculateToll() {
+        if (distance <= 200) {
+            toll = distance * 1.2;
+        } else {
+            toll = 200 * 1.2 + (distance - 200) * 1.2 * 0.75;
+        }
+    }
+
+    double getToll() {
+        return toll;
+    }
+};
+
+int main() {
+    double distance;
+    cin >> distance;
+    Tollway tollway(distance);
+    tollway.calculateToll();
+    cout << round(tollway.getToll()) << endl;
+    return 0;
+}
+```
