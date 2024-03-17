@@ -1,3 +1,5 @@
+//https://dev.to/oyemade/getting-started-w-googles-gemini-pro-llm-using-langchain-js-4o1
+
 import { readFile, writeFile } from 'fs/promises';
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { PromptTemplate } from "@langchain/core/prompts";
