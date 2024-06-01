@@ -12,6 +12,9 @@
   "dependencies": {
     "@langchain/google-genai": "^0.0.10",
     "dotenv": "^16.4.5",
-    "langchain": "^0.1.28"
+    "langchain": "^0.1.28",
+    "playwright": "^1.44.1",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }
