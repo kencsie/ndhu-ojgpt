@@ -10,7 +10,7 @@ async function getProblem() {
     const page = await browser.newPage();
   
     await page.goto(`https://oj.kencs.net/`, { waitUntil: 'networkidle' });
-    await page.goto(`https://oj.kencs.net/problem/PR112-2-41`, { waitUntil: 'networkidle' });
+    await page.goto(`https://oj.kencs.net/problem/PR112-2-51`, { waitUntil: 'networkidle' });
     const contentTexts = await page.$$eval('#problem-content .content', elements =>
     elements.map(element => element.innerText)
     );    
@@ -28,9 +28,9 @@ async function getProblem() {
     const fullCode = codeLines.join('\n');
 
     const question = {
-      'Description':contentTexts[0],
-      'Input':contentTexts[1],
-      'Output':contentTexts[2],
+      'Description':contentTexts[0].replace(/\n\n/g, '\n'),
+      'Input':contentTexts[1].replace(/\n\n/g, '\n'),
+      'Output':contentTexts[2].replace(/\n\n/g, '\n'),
       'SampleInput':sampleInputText,
       'SampleOutput':sampleOutputText,
       'CodeTemplate':fullCode
