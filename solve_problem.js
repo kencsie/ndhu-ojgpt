@@ -1,10 +1,10 @@
 //https://dev.to/oyemade/getting-started-w-googles-gemini-pro-llm-using-langchain-js-4o1
 
-import { readFile, writeFile } from 'fs/promises';
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { ChatOpenAI } from "@langchain/openai";
-import { PromptTemplate} from "@langchain/core/prompts";
-import * as dotenv from "dotenv";
+const { readFile, writeFile } = require('fs').promises;
+const { ChatGoogleGenerativeAI } = require('@langchain/google-genai');
+const { ChatOpenAI } = require('@langchain/openai');
+const { PromptTemplate } = require('@langchain/core/prompts');
+const dotenv = require('dotenv');
 dotenv.config();
 
 
@@ -19,7 +19,9 @@ function initializeModel(modelName) {
   }
 }
 
-async function solveProblem(problem, modelName) {
+async function solveProblem(problemPath, modelName) {
+  const problem = JSON.parse(await readFile(problemPath, "utf-8"));
+
   const template = `
 You are a coding genius. Help the user to solve the code problem using C++:
 Description:{description}
@@ -43,15 +45,18 @@ Note: Only show the output code.
     codeTemplate: "\n"+problem.CodeTemplate,
   });
 
-  console.log(`Prompt:${formattedPromptTemplate}`);
-
   const model = initializeModel(modelName);
-  const result = await model.invoke(formattedPromptTemplate);
+  const answer = await model.invoke(formattedPromptTemplate);
 
-  return result;
+  await writeFile("./data/answer.txt", answer.text);
+
+  console.log(`Solve problem complete.`);
+  return answer.text;
 }
 
-async function explainProblem(problem, code, modelName) {
+async function explainProblem(problemPath, code, modelName) {
+  const problem = JSON.parse(await readFile(problemPath, "utf-8"));
+
   const template = `
 Please explain the answer code, also provide user the learning resources to solve the problem using C++:
 Description:{description}
@@ -68,18 +73,14 @@ Code:{code}
   console.log(`Prompt:${formattedPromptTemplate}`);
 
   const model = initializeModel(modelName);
-  const result = await model.invoke(formattedPromptTemplate);
+  const explaination = await model.invoke(formattedPromptTemplate);
 
-  return result;
+  await writeFile("./data/explaination.txt", explaination.text);
+
+  console.log(`Explain problem complete.`);
 }
 
-
-(async () => {
-  //const modelName = process.env.LLM_MODEL_NAME || "gemini-1.5-pro"; // Set default or get from .env
-  const modelName = process.env.LLM_MODEL_NAME || "gpt-4";
-  const problemData = JSON.parse(await readFile("./data/problem.json", "utf-8"));
-  const answer = await solveProblem(problemData, modelName);
-  const explaination = await explainProblem(problemData, answer.text, modelName);
-  await writeFile("./data/answer.txt", answer.text);
-  await writeFile("./data/explaination.txt", explaination.text);
-})();
+module.exports = {
+  solve: solveProblem,
+  explain: explainProblem
+};

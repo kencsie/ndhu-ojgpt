@@ -3,14 +3,14 @@ const { chromium } = require('playwright-extra');
 const stealth = require('puppeteer-extra-plugin-stealth')();
 chromium.use(stealth);
 
-async function getProblem() {
+async function getProblem(questionID, OJ_URL) {
   const browser = await chromium.launch({ headless: true });
 
   try {
     const page = await browser.newPage();
   
-    await page.goto(`https://oj.kencs.net/`, { waitUntil: 'networkidle' });
-    await page.goto(`https://oj.kencs.net/problem/PR112-2-51`, { waitUntil: 'networkidle' });
+    await page.goto(`${OJ_URL}`, { waitUntil: 'networkidle' });
+    await page.goto(`${OJ_URL}problem/PR112-2-${questionID}`, { waitUntil: 'networkidle' });
     const contentTexts = await page.$$eval('#problem-content .content', elements =>
     elements.map(element => element.innerText)
     );    
@@ -35,28 +35,25 @@ async function getProblem() {
       'SampleOutput':sampleOutputText,
       'CodeTemplate':fullCode
     }
-    console.log(question)
-    await page.screenshot({ path: "./data/oj.png", fullPage: true });
-    
+        
     await browser.close();
-    return question;
+
+    // Convert the object to a string
+    const data = JSON.stringify(question, null, 2);
+
+    // Write the string to a text file
+    fs.writeFile('./data/problem.json', data, (err) => {
+    if (err) {
+      console.error('An error occurred:', err);
+    } else {
+      console.log('File has been saved!');
+    }
+    });
   } catch (error) {
     console.error("An error occurred:", error);
   }
+
+  console.log('Get problem complete.');
 }
 
-(async () => {
-  question = await getProblem();
-
-  // Convert the object to a string
-  const data = JSON.stringify(question, null, 2);
-
-  // Write the string to a text file
-  fs.writeFile('./data/problem.json', data, (err) => {
-  if (err) {
-    console.error('An error occurred:', err);
-  } else {
-    console.log('File has been saved!');
-  }
-  });
-})();
+module.exports = getProblem;
